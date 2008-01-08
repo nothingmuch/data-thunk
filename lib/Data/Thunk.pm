@@ -121,7 +121,7 @@ sub force ($) {
 	use UNIVERSAL::ref;
 
 	use overload (
-        fallback => 1, map {
+		fallback => 1, map {
 			$_ => $vivify_scalar = sub {
 				my $self = $_[0];
 
@@ -135,8 +135,8 @@ sub force ($) {
 
 				$val;
 			}
-        } qw( bool "" 0+ ${} @{} %{} &{} *{} )
-    );
+		} qw( bool "" 0+ ${} @{} %{} &{} *{} )
+	);
 
 	sub ref {
 		my $self = shift;
