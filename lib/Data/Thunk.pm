@@ -202,22 +202,20 @@ In this particular example:
 The resulting structure is:
 
 	$VAR1 = {
-          'bar' => [
-                     'boink'
-                   ],
-          'foo' => 'blah',
-          'gorch' => $VAR1->{'bar'},
-          'quxx' => 'blah'
-        };
+		'bar' => [ 'boink' ],
+		'foo' => 'blah',
+		'gorch' => $VAR1->{'bar'},
+		'quxx' => 'blah'
+	};
 
 Whereas with L<Scalar::Defer> the trampoline objects remain:
 
 	$VAR1 = {
-			  'bar' => bless( do{\(my $o = 25206320)}, '0' ),
-			  'foo' => bless( do{\(my $o = 25387232)}, '0' ),
-			  'gorch' => $VAR1->{'bar'},
-			  'quxx' => $VAR1->{'foo'}
-			};
+		'bar' => bless( do{\(my $o = 25206320)}, '0' ),
+		'foo' => bless( do{\(my $o = 25387232)}, '0' ),
+		'gorch' => $VAR1->{'bar'},
+		'quxx' => $VAR1->{'foo'}
+	};
 
 This is potentially problematic because L<Scalar::Util/reftype> and
 L<Scalar::Util/blessed> can't be fooled. With L<Data::Thunk> the problem still
