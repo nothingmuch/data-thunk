@@ -4,7 +4,7 @@ use strict;
 
 use ExtUtils::MakeMaker;
 
-use 5.010;
+require 5.010;
 
 WriteMakefile(
 	NAME         => 'Data::Thunk',
