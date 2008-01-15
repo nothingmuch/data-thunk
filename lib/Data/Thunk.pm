@@ -262,8 +262,3 @@ Yuval Kogman E<lt>nothingmuch@woobling.orgE<gt>
 
 =cut
 
-
-
-=cut
-
-
