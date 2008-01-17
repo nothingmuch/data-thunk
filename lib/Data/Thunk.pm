@@ -5,6 +5,9 @@ package Data::Thunk;
 use strict;
 use warnings;
 
+use Data::Thunk::Code;
+use Data::Thunk::ScalarValue;
+
 use Scalar::Util qw(blessed);
 
 use base qw(Exporter);
@@ -18,7 +21,7 @@ sub lazy (&) {
 	bless { code => $thunk }, "Data::Thunk::Code";
 }
 
-my ( $vivify_code, $vivify_scalar ); # these lexicals go into the other packages' scopes
+my ( $vivify_code, $vivify_scalar ) = ( $Data::Thunk::Code::vivify_code, $Data::Thunk::ScalarValue::vivify_scalar );
 
 sub force ($) {
 	my $val = shift;
@@ -37,113 +40,6 @@ sub force ($) {
 {
 	package Data::Thunk::NoOverload;
 	# we temporarily bless into this to avoid overloading
-}
-
-{
-	package Data::Thunk::Code;
-	use Data::Swap ();
-	use UNIVERSAL::ref;
-
-	use overload (
-		fallback => 1, map {
-			$_ => $vivify_code = sub {
-				bless $_[0], "Data::Thunk::NoOverload";
-
-				my $tmp = $_[0]->{code}->();
-
-				if ( CORE::ref($tmp) ) {
-					local $@;
-					eval { Data::Swap::swap $_[0], $tmp };
-
-					if ( my $e = $@ ) {
-						# try to figure out where the thunk was defined
-						my $lazy_ctx = eval {
-							require B;
-							my $cv = B::svref_2object($_[0]->{code});
-							my $file = $cv->FILE;
-							my $line = $cv->START->line;
-							"in thunk defined at $file line $line";
-						} || "at <<unknown>>";
-
-						my $file = quotemeta(__FILE__);
-						$e =~ s/ at $file line \d+.\n$/ $lazy_ctx, vivified/; # becomes "vivified at foo line blah"..
-
-						require Carp;
-						Carp::croak($e);
-					}
-
-					return $_[0];
-				} else {
-					Data::Swap::swap $_[0], do { my $o = $tmp; \$o };
-					bless $_[0], "Data::Thunk::ScalarValue";
-					return $_[0];
-				}
-			},
-		} qw( bool "" 0+ ${} @{} %{} &{} *{} )
-	);
-
-	my $vivify_and_call = sub {
-		my $method = shift;
-		$_[0]->$vivify_code();
-		goto &{$_[0]->can($method)}
-	};
-
-	sub ref {
-		CORE::ref($_[0]->$vivify_code);
-	}
-
-	foreach my $sym (keys %UNIVERSAL::) {
-		no strict 'refs';
-		*{$sym} = eval "sub {
-			if ( Scalar::Util::blessed(\$_[0]) ) {
-				unshift \@_, \$sym;
-				goto \$vivify_and_call;
-			} else {
-				shift->SUPER::$sym(\@_);
-			}
-		}";
-	}
-
-	sub AUTOLOAD {
-		my ( $self, @args ) = @_;
-		my ( $method ) = ( our $AUTOLOAD =~ /([^:]+)$/ );
-		unshift @_, $method;
-		goto $vivify_and_call;
-	}
-
-	sub DESTROY {
-		# don't create the value just to destroy it
-	}
-}
-
-{
-	package Data::Thunk::ScalarValue;
-	use UNIVERSAL::ref;
-
-	use overload (
-		fallback => 1, map {
-			$_ => $vivify_scalar = sub {
-				my $self = $_[0];
-
-				# must rebless to something unoverloaded in order to get at the value
-				bless $self, "Data::Thunk::NoOverload";
-				my $val = $$self;
-				bless $self, __PACKAGE__;
-
-				# try to replace the container with the value wherever we found it
-				local $@; eval { $_[0] = $val }; # might be readonly;
-
-				$val;
-			}
-		} qw( bool "" 0+ ${} @{} %{} &{} *{} )
-	);
-
-	sub ref {
-		my $self = shift;
-		return;
-	}
-
-	sub DESTROY { }
 }
 
 __PACKAGE__
