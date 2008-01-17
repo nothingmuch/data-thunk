@@ -27,9 +27,10 @@ sub force ($) {
 	my $val = shift;
 
 	if ( blessed($val) ) { 
-		if ( blessed($val) eq 'Data::Thunk::Code' ) {
+		no warnings; # UNIVERSAL::isa
+		if ( $val->UNIVERSAL::isa('Data::Thunk::Code') ) { # we wanna know what it's *real* class is
 			return $val->$vivify_code;
-		} elsif ( blessed($val) eq 'Data::Thunk::ScalarValue' ) {
+		} elsif ( $val->UNIVERSAL::isa('Data::Thunk::ScalarValue') ) {
 			return $val->$vivify_scalar;
 		}
 	}
