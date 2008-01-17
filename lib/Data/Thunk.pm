@@ -7,6 +7,7 @@ use warnings;
 
 use Data::Thunk::Code;
 use Data::Thunk::ScalarValue;
+use Data::Thunk::Object;
 
 use Scalar::Util qw(blessed);
 
@@ -14,11 +15,23 @@ use base qw(Exporter);
 
 our $VERSION = "0.01";
 
-our @EXPORT = our @EXPORT_OK = qw(lazy force);
+our @EXPORT = our @EXPORT_OK = qw(lazy lazy_new lazy_object force);
 
 sub lazy (&) {
 	my $thunk = shift;
 	bless { code => $thunk }, "Data::Thunk::Code";
+}
+
+sub lazy_new ($;@) {
+	my ( $class, %args ) = @_;
+	my $constructor = delete $args{constructor} || 'new';
+	my $args        = delete $args{args} || [];
+	&lazy_object(sub { $class->$constructor(@$args) }, %args, class => $class);
+}
+
+sub lazy_object (&;@) {
+	my ( $thunk, @args ) = @_;
+	bless { @args, code => $thunk }, "Data::Thunk::Object";
 }
 
 my ( $vivify_code, $vivify_scalar ) = ( $Data::Thunk::Code::vivify_code, $Data::Thunk::ScalarValue::vivify_scalar );
@@ -130,6 +143,26 @@ become objects don't appear to be as such.
 =item lazy { ... }
 
 Create a new thunk.
+
+=item lazy_object { }, %attrs;
+
+Creates a thunk that is expected to be an object.
+
+If the C<class> attribute is provided then C<isa> and C<can> will work as class
+methods without vivifying the object.
+
+Any other attributes in %attrs will be used to shadow method calls. If the keys
+are code references they will be invoked, otherwise they will be simply
+returned as values. This can be useful if some of your object's properties are
+known in advance.
+
+=item lazy_new $class, %args;
+
+A specialization on C<lazy_object> that can call a constructor method based on
+a class for you. The C<constructor> and C<args> arguments (method name or code
+ref, and array reference) will be removed from %args to create the thunk. They
+default to C<new> and an empty array ref by default. Then this function
+delegates to C<lazy_object>.
 
 =item force
 
