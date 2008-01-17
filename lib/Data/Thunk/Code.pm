@@ -8,6 +8,7 @@ use warnings;
 
 use Data::Swap ();
 use UNIVERSAL::ref;
+use Scalar::Util ();
 
 BEGIN {
 	our $vivify_code = sub {
