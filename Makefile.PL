@@ -13,7 +13,7 @@ WriteMakefile(
 	SIGN         => 1,
 	PL_FILES     => { },
 	PREREQ_PM    => {
-		'Test::Use::ok'  => 0,
+		'Test::use::ok'  => 0,
 		'Data::Swap'     => "0.07",
 		'UNIVERSAL::ref' => 0,
 	},
