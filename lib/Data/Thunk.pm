@@ -13,7 +13,7 @@ use Scalar::Util qw(blessed);
 
 use base qw(Exporter);
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 our @EXPORT = our @EXPORT_OK = qw(lazy lazy_new lazy_object force);
 
