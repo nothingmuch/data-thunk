@@ -4,8 +4,6 @@ use strict;
 
 use ExtUtils::MakeMaker;
 
-require 5.010;
-
 WriteMakefile(
 	NAME         => 'Data::Thunk',
 	VERSION_FROM => 'lib/Data/Thunk.pm',
