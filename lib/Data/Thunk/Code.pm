@@ -63,6 +63,8 @@ sub ref {
 
 foreach my $sym (keys %UNIVERSAL::) {
 	no strict 'refs';
+	next if $sym eq 'ref::';
+	next if defined &$sym;
 	*{$sym} = eval "sub {
 		if ( Scalar::Util::blessed(\$_[0]) ) {
 			unshift \@_, \$sym;

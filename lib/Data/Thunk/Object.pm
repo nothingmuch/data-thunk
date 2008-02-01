@@ -38,8 +38,9 @@ sub ref {
 
 
 foreach my $sym (keys %UNIVERSAL::) {
-	next if $sym eq 'ref::';
 	no strict 'refs';
+	next if $sym eq 'ref::';
+	next if defined &$sym;
 	*{$sym} = eval "sub {
 		my ( \$self, \@args ) = \@_;
 
