@@ -1,3 +1,10 @@
+0.04
+	- Fix a bug where UNIVERSAL's symbols are wrapped and the wrappers
+	  overwrite manually defined versions
+	- remove the perl 5.10 requirement because tests seem to be passing. This
+	  might cause problems with thunks vivifying to non overloaded objects in
+	  older perls.
+
 0.03
 	- unbreak release
 	- Add Data::Thunk::Object
