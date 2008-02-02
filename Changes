@@ -1,3 +1,6 @@
+0.05
+	- Work around a strange lexical scoping issue with string eval and 5.6
+
 0.04
 	- Fix a bug where UNIVERSAL's symbols are wrapped and the wrappers
 	  overwrite manually defined versions
