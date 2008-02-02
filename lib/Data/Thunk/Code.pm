@@ -63,6 +63,7 @@ sub ref {
 
 foreach my $sym (keys %UNIVERSAL::) {
 	no strict 'refs';
+
 	next if $sym eq 'ref::';
 	next if defined &$sym;
 	*{$sym} = eval "sub {
