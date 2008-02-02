@@ -66,6 +66,9 @@ foreach my $sym (keys %UNIVERSAL::) {
 
 	next if $sym eq 'ref::';
 	next if defined &$sym;
+
+	local $@;
+
 	*{$sym} = eval "sub {
 		if ( Scalar::Util::blessed(\$_[0]) ) {
 			unshift \@_, \$sym;
@@ -73,7 +76,7 @@ foreach my $sym (keys %UNIVERSAL::) {
 		} else {
 			shift->SUPER::$sym(\@_);
 		}
-	}";
+	}" || die $@;
 }
 
 sub AUTOLOAD {
