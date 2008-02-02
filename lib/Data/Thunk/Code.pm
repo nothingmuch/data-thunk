@@ -71,7 +71,7 @@ foreach my $sym (keys %UNIVERSAL::) {
 
 	*{$sym} = eval "sub {
 		if ( Scalar::Util::blessed(\$_[0]) ) {
-			unshift \@_, \$sym;
+			unshift \@_, '$sym';
 			goto \$vivify_and_call;
 		} else {
 			shift->SUPER::$sym(\@_);
