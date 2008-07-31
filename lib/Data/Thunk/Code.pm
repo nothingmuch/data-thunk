@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 use Data::Swap ();
-use Scalar::Util ();
+use Scalar::Util qw(reftype blessed);
 
 use namespace::clean;
 
@@ -17,14 +17,17 @@ BEGIN {
 	our $vivify_code = sub {
 		bless $_[0], "Data::Thunk::NoOverload";
 
-		my $code = $_[0]->{code};
+		my $scalar = reftype($_[0]) eq "REF";
+		my $code = $scalar ? ${ $_[0] } : $_[0]->{code};
 		my $tmp = $_[0]->$code();
 
 		if ( CORE::ref($tmp) ) {
-			local $@;
-			eval { Data::Swap::swap $_[0], $tmp };
+			my ( $ret, $e ) = do {
+				local $@;
+				eval { Data::Swap::swap $_[0], $tmp; 1 }, $@;
+			};
 
-			if ( my $e = $@ ) {
+			unless ( $ret ) {
 				# try to figure out where the thunk was defined
 				my $lazy_ctx = eval {
 					require B;
@@ -37,13 +40,18 @@ BEGIN {
 				my $file = quotemeta(__FILE__);
 				$e =~ s/ at $file line \d+.\n$/ $lazy_ctx, vivified/; # becomes "vivified at foo line blah"..
 
+				warn "error";
 				require Carp;
 				Carp::croak($e);
 			}
 
 			return $_[0];
 		} else {
-			Data::Swap::swap $_[0], do { my $o = $tmp; \$o };
+			if ( $scalar ) {
+				${ $_[0] } = $tmp;
+			} else {
+				Data::Swap::swap $_[0], do { my $o = $tmp; \$o };
+			}
 			bless $_[0], "Data::Thunk::ScalarValue";
 			return $_[0];
 		}

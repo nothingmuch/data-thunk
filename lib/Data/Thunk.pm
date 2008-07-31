@@ -24,7 +24,7 @@ use Sub::Exporter -setup => {
 
 sub lazy (&) {
 	my $thunk = shift;
-	bless { code => $thunk }, "Data::Thunk::Code";
+	bless \$thunk, "Data::Thunk::Code";
 }
 
 sub lazy_new ($;@) {
