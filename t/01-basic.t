@@ -1,4 +1,4 @@
-use Test::More tests => 35;
+use Test::More tests => 50;
 use ok 'Data::Thunk';
 
 use Scalar::Util qw(reftype);
@@ -67,3 +67,8 @@ can_ok( $obj, "flarp" );
 ok( $obj->isa("Bar"), "object isa bar" );
 
 is( $new, 1, "new called once" );
+
+foreach my $class ( qw( Data::Thunk::Code Data::Thunk::Object Data::Thunk::ScalarValue ) ) {
+	ok( !$class->can($_), "can't call export $_ as method on $class" )
+		for qw(croak carp reftype blessed swap);
+}

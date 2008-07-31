@@ -6,8 +6,9 @@ package Data::Thunk::Code;
 use strict;
 use warnings;
 
-use Data::Swap ();
+use Data::Swap;
 use Scalar::Util qw(reftype blessed);
+use Carp;
 
 use namespace::clean;
 
@@ -24,7 +25,7 @@ BEGIN {
 		if ( CORE::ref($tmp) ) {
 			my ( $ret, $e ) = do {
 				local $@;
-				eval { Data::Swap::swap $_[0], $tmp; 1 }, $@;
+				eval { swap $_[0], $tmp; 1 }, $@;
 			};
 
 			unless ( $ret ) {
@@ -40,9 +41,7 @@ BEGIN {
 				my $file = quotemeta(__FILE__);
 				$e =~ s/ at $file line \d+.\n$/ $lazy_ctx, vivified/; # becomes "vivified at foo line blah"..
 
-				warn "error";
-				require Carp;
-				Carp::croak($e);
+				croak($e);
 			}
 
 			return $_[0];
