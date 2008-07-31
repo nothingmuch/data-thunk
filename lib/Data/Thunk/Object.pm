@@ -6,13 +6,16 @@ use base qw(Data::Thunk::Code);
 use strict;
 use warnings;
 
+use Scalar::Util qw(blessed reftype);
+
+use namespace::clean;
+
 use UNIVERSAL::ref;
-use Scalar::Util ();
 
 our $get_field = sub {
 	my ( $obj, $field ) = @_;
 
-	my $thunk_class = Scalar::Util::blessed($obj) or return;
+	my $thunk_class = blessed($obj) or return;
 	bless $obj, "Data::Thunk::NoOverload";
 
 	my $exists = exists $obj->{$field};

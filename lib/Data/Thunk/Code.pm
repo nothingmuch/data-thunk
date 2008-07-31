@@ -7,8 +7,11 @@ use strict;
 use warnings;
 
 use Data::Swap ();
-use UNIVERSAL::ref;
 use Scalar::Util ();
+
+use namespace::clean;
+
+use UNIVERSAL::ref;
 
 BEGIN {
 	our $vivify_code = sub {

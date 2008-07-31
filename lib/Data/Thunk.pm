@@ -12,6 +12,7 @@ use Data::Thunk::Object;
 use Scalar::Util qw(blessed);
 
 use base qw(Exporter);
+use namespace::clean;
 
 our $VERSION = "0.05";
 

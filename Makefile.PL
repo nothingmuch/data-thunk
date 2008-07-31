@@ -14,6 +14,7 @@ WriteMakefile(
 		'Test::use::ok'  => 0,
 		'Data::Swap'     => "0.07",
 		'UNIVERSAL::ref' => 0,
+		'namespace::clean' => "0.08",
 	},
 );
 
