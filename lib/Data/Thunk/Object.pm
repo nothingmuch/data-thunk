@@ -69,7 +69,7 @@ sub AUTOLOAD {
 		my ( $exists, $value ) = $self->$get_field($method);
 
 		if ( $exists ) {
-			if ( (reftype($value)||'') eq 'CODE' ) {
+			if ( CORE::ref($value) && reftype($value) eq 'CODE' ) {
 				return $self->$value(@args);
 			} else {
 				return $value;
