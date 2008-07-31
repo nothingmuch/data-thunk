@@ -79,14 +79,14 @@ foreach my $sym (keys %UNIVERSAL::) {
 
 	local $@;
 
-	*{$sym} = eval "sub {
+	eval "sub $sym {
 		if ( Scalar::Util::blessed(\$_[0]) ) {
 			unshift \@_, '$sym';
 			goto \$vivify_and_call;
 		} else {
 			shift->SUPER::$sym(\@_);
 		}
-	}" || die $@;
+	}; 1" || warn $@;
 }
 
 sub AUTOLOAD {

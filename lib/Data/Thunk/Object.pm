@@ -48,7 +48,7 @@ foreach my $sym (keys %UNIVERSAL::) {
 
 	local $@;
 
-	*{$sym} = eval "sub {
+	eval "sub $sym {
 		my ( \$self, \@args ) = \@_;
 
 		if ( my \$class = \$self->\$get_field('class') ) {
@@ -56,9 +56,7 @@ foreach my $sym (keys %UNIVERSAL::) {
 		} else {
 			return \$self->SUPER::$sym(\@args);
 		}
-	}" || die $@;
-
-	warn $@ if $@;
+	}; 1" || warn $@;
 }
 
 sub AUTOLOAD {
