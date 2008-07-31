@@ -15,6 +15,7 @@ WriteMakefile(
 		'Data::Swap'     => "0.07",
 		'UNIVERSAL::ref' => 0,
 		'namespace::clean' => "0.08",
+		'Sub::Exporter' => 0,
 	},
 );
 

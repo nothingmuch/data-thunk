@@ -11,12 +11,16 @@ use Data::Thunk::Object;
 
 use Scalar::Util qw(blessed);
 
-use base qw(Exporter);
 use namespace::clean;
 
 our $VERSION = "0.05";
 
-our @EXPORT = our @EXPORT_OK = qw(lazy lazy_new lazy_object force);
+use Sub::Exporter -setup => {
+	exports => [qw(lazy lazy_new lazy_object force)],
+	groups => {
+		default => [':all'],
+	},
+};
 
 sub lazy (&) {
 	my $thunk = shift;
