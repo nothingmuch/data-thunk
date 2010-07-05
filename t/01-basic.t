@@ -1,4 +1,4 @@
-use Test::More tests => 50;
+use Test::More;
 use ok 'Data::Thunk';
 
 use Scalar::Util qw(reftype);
@@ -72,3 +72,5 @@ foreach my $class ( qw( Data::Thunk::Code Data::Thunk::Object Data::Thunk::Scala
 	ok( !$class->can($_), "can't call export $_ as method on $class" )
 		for qw(croak carp reftype blessed swap);
 }
+
+done_testing;
