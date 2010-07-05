@@ -6,6 +6,7 @@ package Data::Thunk::Code;
 use strict;
 use warnings;
 
+use Try::Tiny;
 use Data::Swap;
 use Scalar::Util qw(reftype blessed);
 use Carp;
@@ -23,14 +24,13 @@ BEGIN {
 		my $tmp = $_[0]->$code();
 
 		if ( CORE::ref($tmp) ) {
-			my ( $ret, $e ) = do {
-				local $@;
-				eval { swap $_[0], $tmp; 1 }, $@;
-			};
+			my $ref = \$_[0]; # try doesn't get $_[0]
 
-			unless ( $ret ) {
+			try {
+				swap $$ref, $tmp;
+			} catch {
 				# try to figure out where the thunk was defined
-				my $lazy_ctx = eval {
+				my $lazy_ctx = try {
 					require B;
 					my $cv = B::svref_2object($_[0]->{code});
 					my $file = $cv->FILE;
@@ -38,11 +38,11 @@ BEGIN {
 					"in thunk defined at $file line $line";
 				} || "at <<unknown>>";
 
-				my $file = quotemeta(__FILE__);
-				$e =~ s/ at $file line \d+.\n$/ $lazy_ctx, vivified/; # becomes "vivified at foo line blah"..
+				my $file = __FILE__;
+				s/ at \Q$file\E line \d+.\n$/ $lazy_ctx, vivified/; # becomes "vivified at foo line blah"..
 
-				croak($e);
-			}
+				croak($_);
+			};
 
 			return $_[0];
 		} else {
