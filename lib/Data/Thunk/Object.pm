@@ -79,6 +79,4 @@ sub AUTOLOAD {
 	goto $Data::Thunk::Code::vivify_and_call;
 }
 
-__PACKAGE__
-
-__END__
+1;

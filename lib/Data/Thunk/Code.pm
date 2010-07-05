@@ -118,6 +118,4 @@ sub DESTROY {
 	# don't create the value just to destroy it
 }
 
-__PACKAGE__
-
-__END__
+1;

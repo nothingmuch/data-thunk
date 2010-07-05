@@ -50,6 +50,4 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-__PACKAGE__
-
-__END__
+1;

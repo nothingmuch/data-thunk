@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 package Data::Thunk;
+# ABSTRACT: A sneakier Scalar::Defer ;-)
 
 use strict;
 use warnings;
@@ -12,8 +13,6 @@ use Data::Thunk::Object;
 use Scalar::Util qw(blessed);
 
 use namespace::clean;
-
-our $VERSION = "0.05";
 
 use Sub::Exporter -setup => {
 	exports => [qw(lazy lazy_new lazy_object force)],
@@ -61,15 +60,9 @@ sub force ($) {
 	# we temporarily bless into this to avoid overloading
 }
 
-__PACKAGE__
-
-__END__
+1;
 
 =pod
-
-=head1 NAME
-
-Data::Thunk - A sneakier Scalar::Defer ;-)
 
 =head1 SYNOPSIS
 
@@ -178,22 +171,6 @@ Vivify the value and return the result.
 =head1 SEE ALSO
 
 L<Scalar::Defer>, L<Data::Lazy>, L<Data::Swap>, L<UNIVERSAL::ref>.
-
-=head1 VERSION CONTROL
-
-This module is maintained using Darcs. You can get the latest version from
-L<http://nothingmuch.woobling.org/code>, and use C<darcs send> to commit
-changes.
-
-=head1 AUTHOR
-
-Yuval Kogman E<lt>nothingmuch@woobling.orgE<gt>
-
-=head1 COPYRIGHT
-
-	Copyright (c) 2008 Yuval Kogman. All rights reserved
-	This program is free software; you can redistribute
-	it and/or modify it under the same terms as Perl itself.
 
 =cut
 
