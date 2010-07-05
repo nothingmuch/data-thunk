@@ -10,6 +10,7 @@ use Try::Tiny;
 use Data::Swap;
 use Scalar::Util qw(reftype blessed);
 use Check::ISA;
+use Devel::Refcount qw(refcount);
 use Carp;
 
 use namespace::clean;
@@ -24,7 +25,7 @@ BEGIN {
 		my $code = $scalar ? ${ $_[0] } : $_[0]->{code};
 		my $tmp = $_[0]->$code();
 
-		if ( CORE::ref($tmp) ) {
+		if ( CORE::ref($tmp) and refcount($tmp) == 1 ) {
 			my $ref = \$_[0]; # try doesn't get $_[0]
 
 			try {
@@ -47,12 +48,14 @@ BEGIN {
 
 			return $_[0];
 		} else {
-			if ( $scalar ) {
-				${ $_[0] } = $tmp;
-			} else {
-				Data::Swap::swap $_[0], do { my $o = $tmp; \$o };
+			unless ( $scalar ) {
+				Data::Swap::swap $_[0], do { my $o; \$o };
 			}
+
+			# set up the Scalar Value overload thingy
+			${ $_[0] } = $tmp;
 			bless $_[0], "Data::Thunk::ScalarValue";
+
 			return $tmp;
 		}
 	};

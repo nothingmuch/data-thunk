@@ -1,7 +1,7 @@
 use Test::More;
 use ok 'Data::Thunk';
 
-use Scalar::Util qw(reftype);
+use Scalar::Util qw(reftype blessed);
 
 my $y = 0;
 my $l = lazy { ++$y };
@@ -71,6 +71,17 @@ is( $new, 1, "new called once" );
 foreach my $class ( qw( Data::Thunk::Code Data::Thunk::Object Data::Thunk::ScalarValue ) ) {
 	ok( !$class->can($_), "can't call export $_ as method on $class" )
 		for qw(croak carp reftype blessed swap);
+}
+
+{
+	my $shared;
+
+	my $obj = lazy { $shared = SomeClass->new("foo") };
+
+	is( $obj->meth, "meth", "method call" );
+
+	is( blessed($obj), "SomeClass", "thunk vivified" );
+	is( blessed($shared), "SomeClass", "shared value not destroyed" );
 }
 
 done_testing;
