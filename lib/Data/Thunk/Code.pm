@@ -9,6 +9,7 @@ use warnings;
 use Try::Tiny;
 use Data::Swap;
 use Scalar::Util qw(reftype blessed);
+use Check::ISA;
 use Carp;
 
 use namespace::clean;
@@ -61,10 +62,25 @@ our $vivify_code;
 
 use overload ( fallback => 1, map { $_ => $vivify_code } qw( bool "" 0+ ${} @{} %{} &{} *{} ) );
 
-our $vivify_and_call = sub {
+our $call_method = sub {
 	my $method = shift;
-	$_[0]->$vivify_code();
-	goto &{$_[0]->can($method)}
+
+	if ( inv($_[0]) ) {
+		if ( my $code = $_[0]->can($method) ) {
+			goto &$code;
+		} else {
+			return $_[0]->$method(@_[1 .. $#_]);
+		}
+	} elsif ( defined $_[0] ) {
+		croak qq{Can't call method "$method" without a package or object reference};
+	} else {
+		croak qq{Can't call method "$method" on an undefined value};
+	}
+};
+
+our $vivify_and_call = sub {
+	$_[1]->$vivify_code();
+	goto $call_method;
 };
 
 sub ref {
@@ -90,7 +106,6 @@ foreach my $sym (keys %UNIVERSAL::) {
 }
 
 sub AUTOLOAD {
-	my ( $self, @args ) = @_;
 	my ( $method ) = ( our $AUTOLOAD =~ /([^:]+)$/ );
 	unshift @_, $method;
 	goto $vivify_and_call;
