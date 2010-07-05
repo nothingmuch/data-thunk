@@ -52,7 +52,7 @@ BEGIN {
 				Data::Swap::swap $_[0], do { my $o = $tmp; \$o };
 			}
 			bless $_[0], "Data::Thunk::ScalarValue";
-			return $_[0];
+			return $tmp;
 		}
 	};
 }
